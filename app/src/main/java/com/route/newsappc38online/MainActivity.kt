@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -45,17 +46,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.NavigatorProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.route.newsappc38online.api.APIManager
 import com.route.newsappc38online.api.model.SourceItem
 import com.route.newsappc38online.api.model.SourceResponse
 import com.route.newsappc38online.ui.theme.NewsAppC38OnlineTheme
+import com.route.newsappc38online.widgets.CATEGORIES_ROUTE
 import com.route.newsappc38online.widgets.CategoriesContent
 import com.route.newsappc38online.widgets.DrawerBody
 import com.route.newsappc38online.widgets.DrawerHeader
+import com.route.newsappc38online.widgets.NEWS_ROUTE
+import com.route.newsappc38online.widgets.NewsFragment
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -109,8 +115,6 @@ class MainActivity : ComponentActivity() {
      */
 
 
-    val API_KEY = "c027443ca9624422bfbe9b160b9ec11a"
-
     // Lazy vs Eager Initialization
     var myNumber = 0 // Eager
     val myNumberLazy by lazy {   // Create in Runtime 
@@ -124,32 +128,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             NewsAppC38OnlineTheme {
                 // A surface container using the 'background' color from the theme
-                var sourcesList: MutableState<List<SourceItem>> =
+                val sourcesList: MutableState<List<SourceItem>> =
                     remember {
                         mutableStateOf(listOf()) // ["", ""]
                         // list [           ]
                     }
-                APIManager
-                    .getNewsServices()
-                    .getNewsSources(API_KEY)
-//                    .execute()
-                    .enqueue(object : Callback<SourceResponse> {
-                        override fun onResponse(
-                            call: Call<SourceResponse>,
-                            response: Response<SourceResponse>
-                        ) {
-                            val body = response.body()
-                            Log.e("TAG", "onResponse: ${body?.status}")
-                            Log.e("TAG", "onResponse: ${body?.sources}")
-                            sourcesList.value = body?.sources ?: listOf()
-                        }
-
-                        override fun onFailure(call: Call<SourceResponse>, t: Throwable) {
-
-                        }
-
-                    }
-                    ) // Run On Background Thread
+                // Run On Background Thread
 //                    .execute() // Run On Main Thread
                 // ANR (Application Not Responding  -> Wait - Kill )
                 // Main Thread :- User Interaction
@@ -173,11 +157,21 @@ class MainActivity : ComponentActivity() {
                         // NavController
                         val navController = rememberNavController()
                         NavHost(
-                            navController = navController, startDestination = "categories"
+                            navController = navController,
+                            startDestination = CATEGORIES_ROUTE,
+                            modifier = Modifier.padding(top = it.calculateTopPadding())
                         ) {
-                            composable(route = "categories",) {
-                                CategoriesContent()
-
+                            composable(route = CATEGORIES_ROUTE) {
+                                CategoriesContent(navController)
+                            }
+                            composable(
+                                route = "$NEWS_ROUTE/{category}",
+                                arguments = listOf(navArgument(name = "category") {
+                                    type = NavType.StringType
+                                })
+                            ) {
+                                val argument = it.arguments?.getString("category")
+                                NewsFragment(argument)
                             }
                         }
 
@@ -208,7 +202,7 @@ class MainActivity : ComponentActivity() {
                 )
             ),
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = Color(0xFF39A552),
+                containerColor = colorResource(id = R.color.colorGreen),
                 navigationIconContentColor = Color.White
             ),
             navigationIcon = {
@@ -228,55 +222,6 @@ class MainActivity : ComponentActivity() {
     }
 
     // Recomposition
-    @Composable
-    fun NewsSourcesTabs(
-        sourcesItemsList: List<SourceItem>
-    ) {
-        var selectedIndex3 = remember {
-            mutableStateOf(0) //
-        }
-        var selectedIndex2 = remember {
-            mutableStateOf(0)
-        }
-        var selectedIndex by remember {
-            mutableStateOf(0)
-        }
-
-
-        if (sourcesItemsList.isNotEmpty())
-            ScrollableTabRow(
-                selectedTabIndex = selectedIndex, containerColor = Color.Transparent,
-                divider = {},
-                indicator = {},
-            ) {
-                sourcesItemsList.forEachIndexed { index, sourceItem ->
-                    Tab(
-                        selected = selectedIndex == index,
-                        onClick = {
-                            selectedIndex = index
-                        },
-                        selectedContentColor = Color.White,
-                        unselectedContentColor = Color(0xFF39A552),
-                        modifier = if (selectedIndex == index)
-                            Modifier
-                                .padding(end = 2.dp)
-                                .background(
-                                    Color(0xFF39A552),
-                                    RoundedCornerShape(50)
-                                )
-                        else
-                            Modifier
-                                .padding(end = 2.dp)
-                                .border(2.dp, Color(0xFF39A552), RoundedCornerShape(50)),
-                        text = { Text(text = sourceItem.name ?: "") }
-                    )
-
-
-                }
-
-            }
-
-    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -284,21 +229,12 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun Preview() {
         NewsAppC38OnlineTheme {
+            val drawerState = DrawerState(DrawerValue.Closed)
             Scaffold(
-
+                topBar = { NewsAppBar(drawerState = drawerState) }
             ) {
 
-                NewsSourcesTabs(
-                    sourcesItemsList = listOf(
-                        SourceItem(name = "ABC News"),
-                        SourceItem(name = "ABC News"),
-                        SourceItem(name = "ABC News"),
-                        SourceItem(name = "ABC News"),
-                        SourceItem(name = "ABC News"),
-                        SourceItem(name = "ABC News"),
-                        SourceItem(name = "ABC News"),
-                    )
-                )
+
             }
 
 

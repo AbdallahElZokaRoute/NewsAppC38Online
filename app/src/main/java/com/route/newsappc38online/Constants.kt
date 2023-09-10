@@ -3,6 +3,7 @@ package com.route.newsappc38online
 import com.route.newsappc38online.api.model.Category
 
 object Constants {
+    val API_KEY = "c027443ca9624422bfbe9b160b9ec11a"
     val categories = listOf(
         Category(
             "sports", R.drawable.ball,
