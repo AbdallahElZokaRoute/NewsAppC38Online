@@ -1,10 +1,8 @@
-package com.route.newsappc38online.widgets
+package com.route.newsappc38online.widgets.categories
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -23,13 +21,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.navArgument
 import com.route.newsappc38online.Constants
 import com.route.newsappc38online.api.model.Category
+import com.route.newsappc38online.widgets.news.NEWS_ROUTE
 
 val CATEGORIES_ROUTE = "categories"
 
