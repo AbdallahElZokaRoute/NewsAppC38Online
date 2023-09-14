@@ -1,8 +1,10 @@
 package com.route.newsappc38online.widgets.news
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.route.newsappc38online.Constants
+import com.route.newsappc38online.DetailsActivity
 import com.route.newsappc38online.R
 import com.route.newsappc38online.api.APIManager
 import com.route.newsappc38online.api.model.ArticlesItem
@@ -71,10 +75,17 @@ fun NewsList(articlesList: List<ArticlesItem>) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun NewsCard(articlesItem: ArticlesItem) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 12.dp),
+            .padding(vertical = 4.dp, horizontal = 12.dp)
+            .clickable {
+            val intent = Intent(context, DetailsActivity::class.java)
+            intent.putExtra("article",articlesItem)
+            context.startActivity(intent)
+        },
 
         ) {
         GlideImage(

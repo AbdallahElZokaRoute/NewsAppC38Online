@@ -39,6 +39,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.newsapp.widgets.settings.SETTINGS_ROUTE
+import com.example.newsapp.widgets.settings.SettingsContent
 import com.route.newsappc38online.api.model.SourceItem
 import com.route.newsappc38online.ui.theme.NewsAppC38OnlineTheme
 import com.route.newsappc38online.widgets.categories.CATEGORIES_ROUTE
@@ -151,6 +153,9 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable(route = CATEGORIES_ROUTE) {
                                 CategoriesContent(navController)
+                            }
+                            composable(route= SETTINGS_ROUTE){
+                                SettingsContent()
                             }
                             composable(
                                 route = "$NEWS_ROUTE/{category}",

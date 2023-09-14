@@ -1,6 +1,7 @@
 package com.route.newsappc38online.api.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class NewsResponse(
 
@@ -39,7 +40,7 @@ data class ArticlesItem(
 
     @field:SerializedName("content")
     val content: String? = null
-)
+):Serializable
 
 data class Source(
 

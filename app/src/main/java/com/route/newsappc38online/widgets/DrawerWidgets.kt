@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.newsapp.widgets.settings.SETTINGS_ROUTE
 import com.route.newsappc38online.R
 import com.route.newsappc38online.widgets.categories.CATEGORIES_ROUTE
 
@@ -61,9 +62,10 @@ fun DrawerBody(navController: NavHostController, onCloseDrawer: () -> Unit) {
                 onCloseDrawer()
 //                navController.popBackStack(CATEGORIES_ROUTE, false)
             })
-        NewsDrawerItem(iconId = R.drawable.ic_settings, textId = R.string.settings, {
-
-        })
+        NewsDrawerItem(iconId = R.drawable.ic_settings, textId = R.string.settings) {
+            navController.navigate(SETTINGS_ROUTE)
+            onCloseDrawer()
+        }
     }
 }
 
