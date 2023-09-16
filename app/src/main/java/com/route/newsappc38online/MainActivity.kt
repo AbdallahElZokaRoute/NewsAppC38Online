@@ -2,14 +2,10 @@ package com.route.newsappc38online
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -18,22 +14,16 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -44,28 +34,22 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavGraph
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
-import androidx.navigation.NavigatorProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.route.newsappc38online.api.APIManager
+import com.example.newsapp.widgets.settings.SETTINGS_ROUTE
+import com.example.newsapp.widgets.settings.SettingsContent
 import com.route.newsappc38online.api.model.SourceItem
-import com.route.newsappc38online.api.model.SourceResponse
 import com.route.newsappc38online.ui.theme.NewsAppC38OnlineTheme
-import com.route.newsappc38online.widgets.CATEGORIES_ROUTE
-import com.route.newsappc38online.widgets.CategoriesContent
+import com.route.newsappc38online.widgets.categories.CATEGORIES_ROUTE
+import com.route.newsappc38online.widgets.categories.CategoriesContent
 import com.route.newsappc38online.widgets.DrawerBody
 import com.route.newsappc38online.widgets.DrawerHeader
-import com.route.newsappc38online.widgets.NEWS_ROUTE
-import com.route.newsappc38online.widgets.NewsFragment
+import com.route.newsappc38online.widgets.news.NEWS_ROUTE
+import com.route.newsappc38online.widgets.news.NewsFragment
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
     /***
@@ -133,15 +117,21 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf(listOf()) // ["", ""]
                         // list [           ]
                     }
+                val navController = rememberNavController()
                 // Run On Background Thread
 //                    .execute() // Run On Main Thread
                 // ANR (Application Not Responding  -> Wait - Kill )
                 // Main Thread :- User Interaction
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                val scope = rememberCoroutineScope()
                 ModalNavigationDrawer(drawerContent = {
                     Column(modifier = Modifier.fillMaxSize()) {
                         DrawerHeader()
-                        DrawerBody()
+                        DrawerBody(navController) {
+                            scope.launch {
+                                drawerState.close()
+                            }
+                        }
                     }
 
                 }, drawerState = drawerState) {
@@ -155,7 +145,7 @@ class MainActivity : ComponentActivity() {
                         // B -> C
                         //   -> D
                         // NavController
-                        val navController = rememberNavController()
+
                         NavHost(
                             navController = navController,
                             startDestination = CATEGORIES_ROUTE,
@@ -163,6 +153,9 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable(route = CATEGORIES_ROUTE) {
                                 CategoriesContent(navController)
+                            }
+                            composable(route= SETTINGS_ROUTE){
+                                SettingsContent()
                             }
                             composable(
                                 route = "$NEWS_ROUTE/{category}",
