@@ -24,8 +24,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.route.newsappc38online.Category
 import com.route.newsappc38online.Constants
-import com.route.newsappc38online.api.model.Category
 import com.route.newsappc38online.widgets.news.NEWS_ROUTE
 
 val CATEGORIES_ROUTE = "categories"

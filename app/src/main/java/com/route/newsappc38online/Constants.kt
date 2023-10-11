@@ -1,6 +1,11 @@
 package com.route.newsappc38online
 
-import com.route.newsappc38online.api.model.Category
+data class Category(
+    val apiID: String,
+    val drawableResId: Int,
+    val titleResID: Int,
+    val backgroundColor: Int
+)
 
 object Constants {
     val API_KEY = "c027443ca9624422bfbe9b160b9ec11a"

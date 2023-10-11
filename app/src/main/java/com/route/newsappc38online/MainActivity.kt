@@ -39,7 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.route.newsappc38online.api.model.SourceItem
+import com.route.domain.entities.SourceItemDTO
 import com.route.newsappc38online.ui.theme.NewsAppC38OnlineTheme
 import com.route.newsappc38online.widgets.categories.CATEGORIES_ROUTE
 import com.route.newsappc38online.widgets.categories.CategoriesContent
@@ -47,8 +47,10 @@ import com.route.newsappc38online.widgets.DrawerBody
 import com.route.newsappc38online.widgets.DrawerHeader
 import com.route.newsappc38online.widgets.news.NEWS_ROUTE
 import com.route.newsappc38online.widgets.news.NewsFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     /***
      *
@@ -110,7 +112,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             NewsAppC38OnlineTheme {
                 // A surface container using the 'background' color from the theme
-                val sourcesList: MutableState<List<SourceItem>> =
+                val sourcesList: MutableState<List<SourceItemDTO>> =
                     remember {
                         mutableStateOf(listOf()) // ["", ""]
                         // list [           ]

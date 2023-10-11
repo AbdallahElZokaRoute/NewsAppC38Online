@@ -28,19 +28,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.route.domain.entities.ArticlesItemDTO
+import com.route.domain.entities.SourceItemDTO
 import com.route.newsappc38online.Constants
 import com.route.newsappc38online.R
-import com.route.newsappc38online.api.APIManager
-import com.route.newsappc38online.api.model.ArticlesItem
-import com.route.newsappc38online.api.model.NewsResponse
-import com.route.newsappc38online.api.model.SourceItem
-import com.route.newsappc38online.api.model.SourceResponse
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-
 
 val NEWS_ROUTE = "news"
 
@@ -49,7 +43,7 @@ val NEWS_ROUTE = "news"
 @Composable
 fun NewsFragment(
     category: String?,
-    viewModel: NewsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: NewsViewModel = hiltViewModel() // Lifecycle-Aware
 ) {
 
     viewModel.getNewsSources(category, viewModel.sourcesList)
@@ -60,7 +54,7 @@ fun NewsFragment(
 }
 
 @Composable
-fun NewsList(articlesList: List<ArticlesItem>) {
+fun NewsList(articlesList: List<ArticlesItemDTO>) {
     LazyColumn {
         items(articlesList.size) {
             NewsCard(articlesItem = articlesList.get(it))
@@ -70,7 +64,7 @@ fun NewsList(articlesList: List<ArticlesItem>) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun NewsCard(articlesItem: ArticlesItem) {
+fun NewsCard(articlesItem: ArticlesItemDTO) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -105,9 +99,9 @@ fun NewsCard(articlesItem: ArticlesItem) {
 
 @Composable
 fun NewsSourcesTabs(
-    sourcesItemsList: List<SourceItem>,
-    newsResponseState: MutableState<List<ArticlesItem>?>,
-    viewModel: NewsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    sourcesItemsList: List<SourceItemDTO>,
+    newsResponseState: MutableState<List<ArticlesItemDTO>?>,
+    viewModel: NewsViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
     // MVVM
@@ -157,11 +151,11 @@ fun NewsSourcesTabs(
 @Composable
 fun NewsCardPreview() {
     NewsCard(
-        articlesItem = ArticlesItem(
-            "10 / 9 / 2023",
-            "BBC News",
-            "URL To Image",
-            LoremIpsum(15).toString(), title = "Title ", content = LoremIpsum(20).toString()
+        articlesItem = ArticlesItemDTO(
+            publishedAt = "10 / 9 / 2023",
+            title = "BBC News",
+            urlToImage = "URL To Image",
+            //LoremIpsum(15).toString(), title = "Title ", content = LoremIpsum(20).toString()
 
         )
     )

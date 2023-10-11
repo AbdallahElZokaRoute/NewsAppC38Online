@@ -15,3 +15,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "NewsAppC38Online"
 include(":app")
+include(":domain")
+include(":data")
