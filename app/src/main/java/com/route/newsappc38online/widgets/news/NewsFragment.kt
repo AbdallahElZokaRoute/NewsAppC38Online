@@ -1,24 +1,23 @@
 package com.route.newsappc38online.widgets.news
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,31 +25,84 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.route.domain.entities.ArticlesItemDTO
 import com.route.domain.entities.SourceItemDTO
-import com.route.newsappc38online.Constants
 import com.route.newsappc38online.R
 
-val NEWS_ROUTE = "news"
+const val NEWS_ROUTE = "news"
 
 // MVVM Architecture Pattern
+
+@Composable
+fun RenderStates(viewModel: NewsViewModel = hiltViewModel()) {
+    val state = viewModel.states.value
+    when (state) {
+        is NewsContracts.State.Loading -> {
+            NewsCircularLoading()
+        }
+
+        is NewsContracts.State.Error -> {
+            NewsErrorDialog(errorMessage = state.message)
+        }
+
+        is NewsContracts.State.Loaded -> {
+            Column {
+                NewsSourcesTabs(sourcesItemsList = state.sourcesList)
+                NewsList(state.newsList)
+            }
+        }
+
+        is NewsContracts.State.Idle -> {
+            // Initial State
+        }
+    }
+    val event = viewModel.events.value
+    when (event) {
+        is NewsContracts.Event.Idle -> {
+
+        }
+
+        is NewsContracts.Event.NavigateToArticleDetails -> {
+
+        }
+    }
+}
+
+@Composable
+fun NewsCircularLoading() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = colorResource(id = R.color.colorGreen))
+    }
+}
+
+@Composable
+fun NewsErrorDialog(errorMessage: String) {
+    AlertDialog(onDismissRequest = { }, confirmButton = {
+        Button(onClick = {
+
+        }) {
+            Text(text = "OK")
+        }
+    }, title = {
+        Text(text = errorMessage)
+    })
+}
 
 @Composable
 fun NewsFragment(
     category: String?,
     viewModel: NewsViewModel = hiltViewModel() // Lifecycle-Aware
 ) {
-
-    viewModel.getNewsSources(category, viewModel.sourcesList)
-    Column {
-        NewsSourcesTabs(viewModel.sourcesList.value, viewModel.newsList)
-        NewsList(articlesList = viewModel.newsList.value ?: listOf())
-    }
+    viewModel.handleActions(NewsContracts.Actions.GetNewsSources(category ?: ""))
+    RenderStates()
 }
 
 @Composable
@@ -99,34 +151,31 @@ fun NewsCard(articlesItem: ArticlesItemDTO) {
 
 @Composable
 fun NewsSourcesTabs(
-    sourcesItemsList: List<SourceItemDTO>,
-    newsResponseState: MutableState<List<ArticlesItemDTO>?>,
-    viewModel: NewsViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
+    sourcesItemsList: List<SourceItemDTO>,
+    viewModel: NewsViewModel = hiltViewModel(),
 ) {
     // MVVM
 
 
     if (sourcesItemsList.isNotEmpty())
         ScrollableTabRow(
-            selectedTabIndex = viewModel.selectedIndex.value, containerColor = Color.Transparent,
+            selectedTabIndex = viewModel.selectedIndex.intValue, containerColor = Color.Transparent,
             divider = {},
             indicator = {},
             modifier = modifier
         ) {
             sourcesItemsList.forEachIndexed { index, sourceItem ->
-                if (viewModel.selectedIndex.value == index) {
-                    viewModel.getNewsBySource(sourceItem, newsResponseState = newsResponseState)
-                }
                 Tab(
-                    selected = viewModel.selectedIndex.value == index,
+                    selected = viewModel.selectedIndex.intValue == index,
                     onClick = {
-                        viewModel.selectedIndex.value = index
+                        viewModel.selectedIndex.intValue = index
+                        viewModel.handleActions(NewsContracts.Actions.GetNewsArticles(sourceID = sourceItem.id))
                     },
 
                     selectedContentColor = Color.White,
                     unselectedContentColor = Color(0xFF39A552),
-                    modifier = if (viewModel.selectedIndex.value == index)
+                    modifier = if (viewModel.selectedIndex.intValue == index)
                         Modifier
                             .padding(end = 2.dp)
                             .background(
